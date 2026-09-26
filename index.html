@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="gu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Belief Thermometer – Survey</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>Belief Thermometer</h1>
+  </header>
+
+  <div class="instructions">
+    <p>દરેક વાક્ય વાંચો અને તમારી હાલની સ્થિતિ સૌથી સારી રીતે દર્શાવે એવો <strong>એક જ</strong> વિકલ્પ પસંદ કરો. સાચો કે ખોટો જવાબ નથી — પ્રામાણિક જવાબ જ સૌથી ઉપયોગી છે.</p>
+    <p>દરેક પ્રશ્ન માટે આ 5 વિકલ્પો છે (નીચેથી ઉપર = thermometer):</p>
+    <ol id="scale-list"></ol>
+  </div>
+
+  <div class="progress-bar">
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="progress-label" id="progress-label">0 / 29 જવાબ આપ્યા</div>
+  </div>
+
+  <form id="survey-form">
+    <div id="sections-container"></div>
+  </form>
+
+  <div id="all-done">
+    <div class="result-card">
+      <h3>તમે સર્વે પૂર્ણ કર્યો!</h3>
+      <div class="result-note">તમારો સમય અને પ્રામાણિકતા બદલ આભાર.</div>
+    </div>
+    <div class="restart-row">
+      <button type="button" class="restart-btn" id="restart-btn">ફરીથી ભરો</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="survey-data.js"></script>
+<script src="survey-logic.js"></script>
+</body>
+</html>
