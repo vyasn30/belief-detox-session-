@@ -365,3 +365,20 @@ button.restart-btn {
   border-radius: 999px;
   cursor: pointer;
 }
+.dev-fill-btn {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 100;
+  background: #2b2620;
+  color: #fff;
+  border: 1px dashed #999;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  opacity: 0.8;
+}
+.dev-fill-btn:hover {
+  opacity: 1;
+}

@@ -226,7 +226,7 @@ function computeSectionSummary(section, answers) {
   }));
   const scores = section.questions.map(q => answers[q.id]);
   const average = scores.reduce((a, b) => a + b, 0) / scores.length;
-  return { average, qas };
+  return { average, qas, optionsCount: sectionOptions.length };
 }
 
 function buildResultCardHTML(section, summary, reflections) {
@@ -257,7 +257,7 @@ function buildResultCardHTML(section, summary, reflections) {
     `).join("") + `</div>`;
   }
 
-  const markerPct = ((summary.average - 1) / 4) * 100;
+  const markerPct = ((summary.average - 1) / (summary.optionsCount - 1)) * 100;
 
   return `
     <div class="result-card">
@@ -297,6 +297,34 @@ function init() {
     updateProgress();
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
+
+  const devFillBtn = document.getElementById("dev-fill-btn");
+  if (devFillBtn) {
+    devFillBtn.addEventListener("click", () => {
+      SECTIONS.forEach(section => {
+        const sectionOptions = section.options || OPTIONS;
+        section.questions.forEach(q => {
+          const value = Math.floor(Math.random() * sectionOptions.length) + 1;
+          const input = form.querySelector(`input[name="q${q.id}"][value="${value}"]`);
+          if (input) {
+            input.checked = true;
+            input.dispatchEvent(new Event("change", { bubbles: true }));
+          }
+          if (q.trigger_box) {
+            const ta = form.querySelector(`textarea[name="trigger${q.id}"]`);
+            if (ta) ta.value = `Test trigger ${Math.floor(Math.random() * 1000)}`;
+          }
+        });
+        if (section.reflection) {
+          section.reflection.forEach(r => {
+            const ta = form.querySelector(`textarea[name="${r.id}"]`);
+            if (ta) ta.value = `Test reflection ${Math.floor(Math.random() * 1000)}`;
+          });
+        }
+      });
+      updateProgress();
+    });
+  }
 }
 
 init();
