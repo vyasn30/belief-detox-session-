@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="gu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>મૂળભૂત માન્યતાઓ – નવો સર્વે</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .belief-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 18px;
+  }
+  .belief-num {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    border: 1px solid var(--accent-soft);
+    border-radius: 999px;
+    padding: 2px 10px;
+    margin-bottom: 10px;
+  }
+  .belief-statement {
+    font-size: 1.08rem;
+    font-weight: 600;
+    line-height: 1.6;
+    margin: 0 0 16px;
+  }
+  .belief-ref {
+    display: none;
+    margin-top: 16px;
+    padding: 14px 16px;
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+  }
+  .belief-ref.show { display: block; }
+  .belief-ref-title {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .quote-block { margin-bottom: 12px; }
+  .quote-block:last-child { margin-bottom: 0; }
+  .quote-gu {
+    margin: 0 0 6px;
+    font-size: 1rem;
+    line-height: 1.85;
+  }
+  .quote-translit {
+    margin: 0 0 6px;
+    font-style: italic;
+    color: var(--muted);
+    font-size: 0.86rem;
+    line-height: 1.5;
+  }
+  .quote-cite {
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .quote-cite .topic-gu {
+    color: var(--text);
+  }
+  .next-section-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+</style>
+</head>
+<body>
+<button type="button" id="dev-fill-btn" class="dev-fill-btn">🛠 Fill random (dev)</button>
+<div class="wrap">
+
+  <header class="top">
+    <h1>મૂળભૂત માન્યતાઓ</h1>
+  </header>
+
+  <div class="instructions">
+    <p>આ વિભાગમાં 6 પાયાની માન્યતાઓ છે. દરેક વાક્ય વાંચીને, તમે તેની સાથે કેટલા સંમત છો તે પ્રામાણિકપણે પસંદ કરો. સાચો કે ખોટો જવાબ નથી — ફક્ત તમે અત્યારે ક્યાં ઊભા છો એ જોવાનું છે.</p>
+    <p>જવાબ આપ્યા પછી, એ વાક્ય ક્યાંથી લેવાયું છે એનો મૂળ સંદર્ભ નીચે દેખાશે.</p>
+  </div>
+
+  <div class="progress-bar">
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="progress-label" id="progress-label">0 / 6 જવાબ આપ્યા</div>
+  </div>
+
+  <form id="beliefs-form">
+    <div id="beliefs-container"></div>
+  </form>
+
+  <div class="section-footer">
+    <div class="validation-msg" id="validation-msg">આગળ વધતા પહેલાં બધા 6 વાક્યોના જવાબ આપો.</div>
+    <button type="button" class="submit-btn next-section-btn" id="next-section-btn" disabled>વિભાગ 2 તરફ આગળ વધો</button>
+  </div>
+
+</div>
+
+<script>
+const OPTIONS = [
+  "સંપૂર્ણ સંમત",
+  "સંમત",
+  "તટસ્થ / ખાસ વિચાર્યું નથી",
+  "અસંમત",
+  "સંપૂર્ણ અસંમત"
+];
+
+const BELIEFS = [
+  {
+    id: "b1",
+    statement: "વિષયસુખ એ ખરું સુખ નથી, માત્ર માન્યતા છે — ખરું સુખ અંદર, આત્મામાં જ છે.",
+    quotes: [
+      {
+        gu: "વિષયમાં તો સુખ હોતું હશે ? સાચું સુખ તો મહીં આત્મામાં છે પણ આ તો બહાર બીજામાં (પાંચ ઈન્દ્રિયોના વિષયોમાં) સુખનો આરોપ કરે છે, તેથી એને એમાં સુખ લાગે છે !",
+        translit: "Vishayma to sukh hotu hashe? Sachu sukh to mahi aatmama chhe pan aa to bahar bijama (panch indriyona vishayoma) sukhno aarop kare chhe, tethi ene ema sukh lage chhe!",
+        cite: "Dadavani · January 2017 · કવર ટૅગલાઇન (cover tagline) · કોઈ વિભાગ/ફકરો નથી"
+      }
+    ]
+  },
+  {
+    id: "b2",
+    statement: "વિષયમાં સુખ છે એવી માન્યતા લોકસંજ્ઞાથી (સમાજના કહેવાથી) ઊભી થઈ છે — આપણે જાતે શોધેલી નથી.",
+    quotes: [
+      {
+        gu: "લોકસંજ્ઞા એટલે લોકોએ જેમાં સુખ માન્યું, તેમાં આપણે પણ સુખ માનવું એ લોકસંજ્ઞા છે.",
+        translit: "Loksangna etale loko-e jema sukh manyu, tema aapane pan sukh manvu e loksangna chhe.",
+        cite: "Dadavani · January 2015 · સંપાદકીય — વિષયના વમળમાં ફસાયા લોકસંજ્ઞાએ (Vishayna vamalma fasaya loksangna-e) · ¶2, l.1"
+      },
+      {
+        gu: "લોકોએ માન્યું એ આપણેય માન્યું. પણ બુદ્ધિપૂર્વકનુંય સુખ નથી આ; અવિચાર્યું સુખ છે.",
+        translit: "Loko-e manyu e aapane-y manyu. Pan buddhipurvaknu-y sukh nathi aa; avicharyu sukh chhe.",
+        cite: "Dadavani · January 2015 · સંસાર વમળમાં ખૂંપાયા વિપરીત બુદ્ધિએ (Sansar vamalma khumpaya viprit buddhi-e) · ¶1, l.1–2"
+      }
+    ]
+  },
+  {
+    id: "b3",
+    statement: "વિષયસુખ ક્ષણિક છે; શરૂઆતમાં મીઠું લાગે, પણ પરિણામે કડવું જ નીકળે છે.",
+    quotes: [
+      {
+        gu: "વિષય હંમેશા પરિણામે કડવો છે. શરૂઆતમાં એને એવું લાગે છે કે આ વિષય સુખદાયી છે, પણ પરિણામે તો એ કડવો જ છે. એનો વિપાકેય કડવો છે.",
+        translit: "Vishay hammesha parinaame kadvo chhe. Sharu-aatma ene evu lage chhe ke aa vishay sukhdayi chhe, pan parinaame to e kadvo j chhe. Eno vipakey kadvo chhe.",
+        cite: "Dadavani · January 2017 · વિષયથી જરા ખસી તો જુઓ (Vishayathi jara khasi to juo) · ¶1, l.2"
+      }
+    ]
+  },
+  {
+    id: "b4",
+    statement: "વિષય-વિકાર એ જ ક્રોધ-માન-માયા-લોભ (કષાય) બધાનું મૂળ છે.",
+    quotes: [
+      {
+        gu: "આ બધાનું મૂળ છે વિષય. અને આ દુનિયામાં મોટામાં મોટી ફસામણ હોય તો વિષય અને એમાં કશુંય સુખ નથી.",
+        translit: "Aa badhanu mul chhe vishay. Ane aa duniyama motama moti fasaman hoy to vishay ane ema kashuy sukh nathi.",
+        cite: "Dadavani · January 2015 · કષાયોના મૂળમાં છે વિષયોનો વમળ (Kashayona mulma chhe vishayono vamal) · ¶1, l.1"
+      },
+      {
+        gu: "કષાય ક્યાંથી જન્મ્યા ? ત્યારે કહે, વિષયમાંથી.",
+        translit: "Kashay kyathi janmya? Tyare kahe, vishaymathi.",
+        cite: "Dadavani · January 2015 · વિષય-કષાયના મૂળિયામાં છે 'અજ્ઞાનતા' (Vishay-kashayna muliyama chhe 'Agnanta') · ¶2, l.2–3"
+      }
+    ]
+  },
+  {
+    id: "b5",
+    statement: "વિષયમાં સુખ કરતાં વિષયને આધીન રહેવાની પરવશતાનું દુઃખ વધારે છે.",
+    quotes: [
+      {
+        gu: "વિષયમાં સુખ કરતાં વિષયથી પરવશતાના દુઃખ વિશેષ છે !",
+        translit: "Vishayma sukh karta vishayathi paravashtana dukh vishesh chhe!",
+        cite: "Dadavani · January 2015 · વિષયની પરવશતાના દુઃખો વિશેષ (Vishayni paravashtana dukho vishesh) · ¶1, l.1"
+      }
+    ]
+  },
+  {
+    id: "b6",
+    statement: "વિષયની પકડ પરાણે દબાવવાથી નહીં, સાચી સમજણથી જ તૂટે છે.",
+    quotes: [
+      {
+        gu: "જે સમજણ ક્રિયાકારી હોય તે જ સાચી સમજણ કહેવાય, બીજી બધી વાંઝિયા સમજણ કહેવાય.",
+        translit: "Je samajan kriyakari hoy te j sachi samajan kahevay, biji badhi vanjhiya samajan kahevay.",
+        cite: "Dadavani · January 2017 · સાચી સમજણ ક્રિયાકારી થાય (Sachi samajan kriyakari thay) · ¶1, l.1"
+      },
+      {
+        gu: "વિષયના વિચારો જેને ના ગમતા હોય ને તેનાથી છૂટવું હોય તેણે આ સામાયિકથી, શુદ્ધ ઉપયોગથી ઓગાળી શકાય તેમ છે.",
+        translit: "Vishayna vicharo jene na gamta hoy ne tenathi chhutvu hoy tene aa samayikthi, shuddha upayogthi ogali shakay tem chhe.",
+        cite: "Dadavani · January 2017 · વિષય બીજ નિર્મૂળ શુદ્ધ ઉપયોગે (Vishay bij nirmul shuddha upayoge) · ¶1, l.1"
+      }
+    ]
+  }
+];
+
+const container = document.getElementById("beliefs-container");
+const answers = {};
+
+function renderBeliefs() {
+  BELIEFS.forEach((b, idx) => {
+    const card = document.createElement("div");
+    card.className = "belief-card";
+    card.id = `card-${b.id}`;
+
+    const num = document.createElement("div");
+    num.className = "belief-num";
+    num.textContent = `વાક્ય ${idx + 1} / ${BELIEFS.length}`;
+    card.appendChild(num);
+
+    const stmt = document.createElement("p");
+    stmt.className = "belief-statement";
+    stmt.textContent = b.statement;
+    card.appendChild(stmt);
+
+    const opts = document.createElement("div");
+    opts.className = "options";
+    OPTIONS.forEach((label, oi) => {
+      const optLabel = document.createElement("label");
+      optLabel.className = "option";
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = b.id;
+      input.value = oi + 1;
+      input.addEventListener("change", () => onAnswer(b, card, opts, oi + 1));
+      optLabel.appendChild(input);
+      const span = document.createElement("span");
+      span.textContent = label;
+      optLabel.appendChild(span);
+      opts.appendChild(optLabel);
+    });
+    card.appendChild(opts);
+
+    const ref = document.createElement("div");
+    ref.className = "belief-ref";
+    ref.id = `ref-${b.id}`;
+
+    const refTitle = document.createElement("div");
+    refTitle.className = "belief-ref-title";
+    refTitle.textContent = "મૂળ સંદર્ભ";
+    ref.appendChild(refTitle);
+
+    b.quotes.forEach(q => {
+      const qb = document.createElement("div");
+      qb.className = "quote-block";
+      const qgu = document.createElement("p");
+      qgu.className = "quote-gu";
+      qgu.textContent = q.gu;
+      qb.appendChild(qgu);
+      const qt = document.createElement("p");
+      qt.className = "quote-translit";
+      qt.textContent = `"${q.translit}"`;
+      qb.appendChild(qt);
+      const qc = document.createElement("div");
+      qc.className = "quote-cite";
+      qc.textContent = q.cite;
+      qb.appendChild(qc);
+      ref.appendChild(qb);
+    });
+
+    card.appendChild(ref);
+    container.appendChild(card);
+  });
+}
+
+function onAnswer(belief, card, opts, value) {
+  answers[belief.id] = value;
+  [...opts.children].forEach(o => o.classList.remove("selected"));
+  opts.children[value - 1].classList.add("selected");
+  document.getElementById(`ref-${belief.id}`).classList.add("show");
+  updateProgress();
+}
+
+function updateProgress() {
+  const count = Object.keys(answers).length;
+  const total = BELIEFS.length;
+  document.getElementById("progress-fill").style.width = `${(count / total) * 100}%`;
+  document.getElementById("progress-label").textContent = `${count} / ${total} જવાબ આપ્યા`;
+  document.getElementById("next-section-btn").disabled = count < total;
+}
+
+document.getElementById("dev-fill-btn").addEventListener("click", () => {
+  BELIEFS.forEach(b => {
+    const value = Math.floor(Math.random() * OPTIONS.length) + 1;
+    const input = document.querySelector(`input[name="${b.id}"][value="${value}"]`);
+    input.checked = true;
+    input.dispatchEvent(new Event("change"));
+  });
+});
+
+document.getElementById("next-section-btn").addEventListener("click", () => {
+  if (Object.keys(answers).length < BELIEFS.length) {
+    document.getElementById("validation-msg").style.display = "block";
+    return;
+  }
+  window.location.href = "section2.html";
+});
+
+renderBeliefs();
+</script>
+</body>
+</html>

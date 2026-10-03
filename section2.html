@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="gu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>દોષ-પેટર્ન – નવો સર્વે</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .scn-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 18px;
+  }
+  .scn-num {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    border: 1px solid var(--accent-soft);
+    border-radius: 999px;
+    padding: 2px 10px;
+    margin-bottom: 10px;
+  }
+  .scn-text {
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.7;
+    margin: 0 0 16px;
+    padding: 12px 14px;
+    background: var(--accent-soft);
+    border-radius: 10px;
+  }
+  .reflect-hint {
+    font-size: 0.84rem;
+    color: var(--muted);
+    margin: -2px 0 10px;
+    font-style: italic;
+  }
+  .section-divider {
+    margin: 32px 0 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .section-divider::before,
+  .section-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-divider span {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .next-section-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+</style>
+</head>
+<body>
+<button type="button" id="dev-fill-btn" class="dev-fill-btn">🛠 Fill random (dev)</button>
+<div class="wrap">
+
+  <header class="top">
+    <h1>દોષ-પેટર્ન</h1>
+  </header>
+
+  <div class="instructions">
+    <p>કલ્પના કરો — તમે એક સાધક છો, અને આ તમારો નબળામાં નબળો દિવસ છે. નીચેના પ્રસંગોમાં, તમે ખરેખર શું કરશો (કરતા હતા) એ પ્રામાણિકપણે પસંદ કરો.</p>
+    <p>દરેક પ્રસંગમાંથી <strong>એક જ</strong> વિકલ્પ પસંદ કરવાનો છે — જે તમારા વર્તનની સૌથી નજીક છે. સાચો કે ખોટો જવાબ નથી.</p>
+  </div>
+
+  <div class="progress-bar">
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="progress-label" id="progress-label">0 / 6 જવાબ આપ્યા</div>
+  </div>
+
+  <form id="scenarios-form">
+    <div id="scenarios-container"></div>
+  </form>
+
+  <div class="section-divider"><span>Reflection — text, not scored</span></div>
+
+  <div class="reflect-card">
+    <div class="not-scored">સ્કોર થતું નથી</div>
+    <label for="r1">છેલ્લા અઠવાડિયામાં તમે બહારની કઈ કઈ વસ્તુઓમાંથી સુખ મેળવવાનો પ્રયત્ન કર્યો?</label>
+    <p class="reflect-hint">દા.ત. ખાવાનું, ફોન/social media, shopping, ...</p>
+    <textarea id="r1" rows="3"></textarea>
+  </div>
+
+  <div class="reflect-card">
+    <div class="not-scored">સ્કોર થતું નથી</div>
+    <label for="r2">સ્ટ્રેસ કે થાક પછી કયા movies/series/YouTube/shorts-reels વગેરેમાંથી સુખ મેળવવાનો પ્રયત્ન કર્યો?</label>
+    <p class="reflect-hint">શું જોયું અને લગભગ કેટલો સમય (છેલ્લા 1-2 અઠવાડિયામાં) — એ લખો.</p>
+    <textarea id="r2" rows="3"></textarea>
+  </div>
+
+  <div class="section-footer">
+    <div class="validation-msg" id="validation-msg">આગળ વધતા પહેલાં બધા 6 પ્રસંગોના જવાબ આપો.</div>
+    <button type="button" class="submit-btn next-section-btn" id="next-section-btn" disabled>વિભાગ 3 તરફ આગળ વધો</button>
+  </div>
+
+</div>
+
+<script>
+const SCENARIOS = [
+  {
+    id: "sc1",
+    text: "રાત્રે મોડે સુધી કામ ચાલ્યું. ઊંઘ નથી આવતી. ફોન હાથમાં છે. ઘરમાં/રૂમમાં બીજું કોઈ નથી.",
+    options: [
+      "ફોન બાજુ પર મૂકી સૂવાનો પ્રયત્ન કરું.",
+      "થોડીવાર reels/social media જોઉં, પણ વિષય તરફ ન જાઉં.",
+      "શરૂઆતમાં normal જોતો હોઉં, પણ ધીમે ધીમે વિષય તરફ સરકી જાઉં.",
+      "સીધો વિષય શોધવા જ લાગું.",
+      "ખબર નથી / આવો પ્રસંગ યાદ નથી."
+    ]
+  },
+  {
+    id: "sc2",
+    text: "કોઈકે અપમાન કર્યું. એ જ સાંજે self negativity થાય છે, mood ખરાબ છે, કંઈક \"feel better\" કરવું છે.",
+    options: [
+      "કોઈ મિત્ર સાથે વાત કરું અથવા walk લઉં.",
+      "ખાવા-પીવામાં કે બીજા entertainment (movie, game) માં mood ઠીક કરવાનો પ્રયત્ન કરું.",
+      "ફોન પર scroll કરતા કરતા ધીમે ધીમે વિષય તરફ જાઉં.",
+      "સીધો વિષય તરફ જ જાઉં — એ સૌથી ઝડપી રસ્તો લાગે.",
+      "ખબર નથી / આવો પ્રસંગ યાદ નથી."
+    ]
+  },
+  {
+    id: "sc3",
+    text: "2 અઠવાડિયાથી સાફ ચાલતું હતું. આજે friend ના group chat માં કોઈએ suggestive reel/meme share કર્યું.",
+    options: [
+      "Chat બંધ કરી દઉં અથવા ignore કરું.",
+      "જોઈ લઉં, પણ ત્યાં જ અટકી જાઉં — આગળ ન વધું.",
+      "જોયા પછી મનમાં વિચાર ચાલુ થઈ જાય, પછી જાતે શોધવા લાગું.",
+      "\"2 અઠવાડિયા થયા, એક વાર તો ચાલે\" એમ વિચારી વિષય તરફ જાઉં.",
+      "ખબર નથી / આવો પ્રસંગ યાદ નથી."
+    ]
+  },
+  {
+    id: "sc4",
+    text: "Stress માંથી break લેવા ફોન ખોલ્યો. \"ફક્ત 5 મિનિટ જોઈ લઉં\" એમ વિચાર્યું.",
+    options: [
+      "ખરેખર 5-10 મિનિટમાં ફોન મૂકી દઉં.",
+      "સમયનું ભાન નથી રહેતું, પણ વિષય તરફ નથી જતો.",
+      "5 મિનિટ ક્યારે કલાકોમાં ફેરવાઈ જાય ખબર જ નથી પડતી, ને વિષય તરફ પણ જાઉં.",
+      "શરૂઆતથી જ ખબર હોય છે કે \"5 મિનિટ\" ખોટું બહાનું છે, છતાં એ જ રસ્તે જાઉં.",
+      "ખબર નથી / આવો પ્રસંગ યાદ નથી."
+    ]
+  },
+  {
+    id: "sc5",
+    text: "સવારે ઊઠીને ખૂબ પસ્તાવો થયો. કોઈ નજીકનું પૂછે, \"કેમ ચાલે છે આજકાલ?\" — તમે શું કહેશો?",
+    options: [
+      "સાચું કહી દઉં, જે થયું એ જેમ છે તેમ.",
+      "વાત ટાળી દઉં, વિષય જ બદલી નાખું.",
+      "\"બધું ઠીક ચાલે છે\" કહી દઉં, ખોટું બોલીને.",
+      "ગુસ્સે થઈ જાઉં કે આવું કેમ પૂછ્યું.",
+      "ખબર નથી / આવો પ્રસંગ યાદ નથી."
+    ]
+  },
+  {
+    id: "sc6",
+    text: "રાત્રે ઘરના, સાધક મિત્રો, roommate કે co-worker/co-સેવાર્થી સાથે ઝઘડો થયો. ગુસ્સો છે, કંઈક release જોઈએ છે.",
+    options: [
+      "ગુસ્સો શાંત થવા દઉં, ખાસ કંઈ ન કરું.",
+      "Outdoor games રમવા, exercise, કે music જેવું કંઈક કરું.",
+      "ફોન પર scroll કરતા કરતા વિષય તરફ જાઉં, release માટે.",
+      "ઝઘડા પછી તરત જ વિષય તરફ જાઉં — almost automatic.",
+      "ખબર નથી / આવો પ્રસંગ યાદ નથી."
+    ]
+  }
+];
+
+const container = document.getElementById("scenarios-container");
+const answers = {};
+
+function renderScenarios() {
+  SCENARIOS.forEach((s, idx) => {
+    const card = document.createElement("div");
+    card.className = "scn-card";
+    card.id = `card-${s.id}`;
+
+    const num = document.createElement("div");
+    num.className = "scn-num";
+    num.textContent = `પ્રસંગ ${idx + 1} / ${SCENARIOS.length}`;
+    card.appendChild(num);
+
+    const text = document.createElement("p");
+    text.className = "scn-text";
+    text.textContent = s.text;
+    card.appendChild(text);
+
+    const opts = document.createElement("div");
+    opts.className = "options";
+    s.options.forEach((label, oi) => {
+      const optLabel = document.createElement("label");
+      optLabel.className = "option";
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = s.id;
+      input.value = oi + 1;
+      input.addEventListener("change", () => onAnswer(s.id, opts, oi + 1));
+      optLabel.appendChild(input);
+      const span = document.createElement("span");
+      span.textContent = label;
+      optLabel.appendChild(span);
+      opts.appendChild(optLabel);
+    });
+    card.appendChild(opts);
+
+    container.appendChild(card);
+  });
+}
+
+function onAnswer(id, opts, value) {
+  answers[id] = value;
+  [...opts.children].forEach(o => o.classList.remove("selected"));
+  opts.children[value - 1].classList.add("selected");
+  saveAnswersToSession();
+  updateProgress();
+}
+
+function saveAnswersToSession() {
+  const byIndex = SCENARIOS.map(s => {
+    const value = answers[s.id];
+    return value ? s.options[value - 1] : null;
+  });
+  sessionStorage.setItem("section2Answers", JSON.stringify(byIndex));
+}
+
+function updateProgress() {
+  const count = Object.keys(answers).length;
+  const total = SCENARIOS.length;
+  document.getElementById("progress-fill").style.width = `${(count / total) * 100}%`;
+  document.getElementById("progress-label").textContent = `${count} / ${total} જવાબ આપ્યા`;
+  document.getElementById("next-section-btn").disabled = count < total;
+}
+
+document.getElementById("dev-fill-btn").addEventListener("click", () => {
+  SCENARIOS.forEach(s => {
+    const value = Math.floor(Math.random() * s.options.length) + 1;
+    const input = document.querySelector(`input[name="${s.id}"][value="${value}"]`);
+    input.checked = true;
+    input.dispatchEvent(new Event("change"));
+  });
+});
+
+document.getElementById("next-section-btn").addEventListener("click", () => {
+  if (Object.keys(answers).length < SCENARIOS.length) {
+    document.getElementById("validation-msg").style.display = "block";
+    return;
+  }
+  window.location.href = "section3.html";
+});
+
+renderScenarios();
+</script>
+</body>
+</html>

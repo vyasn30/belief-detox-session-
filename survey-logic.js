@@ -34,8 +34,8 @@ function renderSections() {
       const optionsEl = document.createElement("div");
       optionsEl.className = "options";
 
-      const sectionOptions = section.options || OPTIONS;
-      sectionOptions.forEach((optText, idx2) => {
+      const questionOptions = q.options || section.options || OPTIONS;
+      questionOptions.forEach((optText, idx2) => {
         const value = idx2 + 1;
         const label = document.createElement("label");
         label.className = "option";
@@ -219,11 +219,14 @@ function collectReflections() {
 // section has them) invite the participant to notice things themselves.
 function computeSectionSummary(section, answers) {
   const sectionOptions = section.options || OPTIONS;
-  const qas = section.questions.map(q => ({
-    id: q.id,
-    text: q.text,
-    answerText: sectionOptions[answers[q.id] - 1]
-  }));
+  const qas = section.questions.map(q => {
+    const questionOptions = q.options || sectionOptions;
+    return {
+      id: q.id,
+      text: q.text,
+      answerText: questionOptions[answers[q.id] - 1]
+    };
+  });
   const scores = section.questions.map(q => answers[q.id]);
   const average = scores.reduce((a, b) => a + b, 0) / scores.length;
   return { average, qas, optionsCount: sectionOptions.length };
@@ -302,9 +305,9 @@ function init() {
   if (devFillBtn) {
     devFillBtn.addEventListener("click", () => {
       SECTIONS.forEach(section => {
-        const sectionOptions = section.options || OPTIONS;
         section.questions.forEach(q => {
-          const value = Math.floor(Math.random() * sectionOptions.length) + 1;
+          const questionOptions = q.options || section.options || OPTIONS;
+          const value = Math.floor(Math.random() * questionOptions.length) + 1;
           const input = form.querySelector(`input[name="q${q.id}"][value="${value}"]`);
           if (input) {
             input.checked = true;

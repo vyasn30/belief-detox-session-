@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="gu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>દોષ પાછળ છુપાયેલી ખોટી માન્યતાઓ – નવો સર્વે</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .scn-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 18px;
+  }
+  .scn-num {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    border: 1px solid var(--accent-soft);
+    border-radius: 999px;
+    padding: 2px 10px;
+    margin-bottom: 10px;
+  }
+  .scn-text {
+    font-size: 1.02rem;
+    font-weight: 600;
+    line-height: 1.7;
+    margin: 0 0 10px;
+    padding: 12px 14px;
+    background: var(--accent-soft);
+    border-radius: 10px;
+  }
+  .scn-prompt {
+    font-size: 0.88rem;
+    color: var(--muted);
+    margin: 0 0 12px;
+  }
+  .prev-answer {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--text);
+    border-left: 3px solid var(--accent);
+    padding: 8px 12px;
+    margin: 0 0 12px;
+    font-style: italic;
+  }
+  .prev-label {
+    display: block;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    font-weight: 700;
+    font-style: normal;
+    margin-bottom: 3px;
+  }
+  .reflect-hint {
+    font-size: 0.84rem;
+    color: var(--muted);
+    margin: -2px 0 10px;
+    font-style: italic;
+  }
+  .section-divider {
+    margin: 32px 0 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .section-divider::before,
+  .section-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-divider span {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .next-section-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+</style>
+</head>
+<body>
+<button type="button" id="dev-fill-btn" class="dev-fill-btn">🛠 Fill random (dev)</button>
+<div class="wrap">
+
+  <header class="top">
+    <h1>દોષ પાછળ છુપાયેલી ખોટી માન્યતાઓ</h1>
+  </header>
+
+  <div class="instructions">
+    <p>આ એ જ 6 પ્રસંગો છે જે તમે પહેલાંના વિભાગમાં જોયા. હવે દરેક પ્રસંગમાં પાછા જાવ — એ ક્ષણે, દોષ તરફ જતાં પહેલાં અથવા જતી વખતે, મનમાં કયો વિચાર/બહાનું ચાલતું હતું?</p>
+    <p>જેટલા લાગુ પડે એટલા પસંદ કરો — સાચો કે ખોટો જવાબ નથી.</p>
+  </div>
+
+  <div class="progress-bar">
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="progress-label" id="progress-label">0 / 6 પ્રસંગોમાં જવાબ આપ્યા</div>
+  </div>
+
+  <form id="wb-form">
+    <div id="wb-container"></div>
+  </form>
+
+  <div class="section-divider"><span>Reflection — text, not scored</span></div>
+
+  <div class="reflect-card">
+    <div class="not-scored">સ્કોર થતું નથી</div>
+    <label for="r1">તમારા પોતાના શબ્દોમાં — કોઈ એવો વિચાર/બહાનું જે ઉપરના કોઈ પ્રસંગમાં નહોતું, પણ તમારામાં વારંવાર આવે છે?</label>
+    <p class="reflect-hint">ઉપરના options માંથી કોઈ બંધબેસતું ન હોય તો અહીં તમારા પોતાના શબ્દોમાં લખો.</p>
+    <textarea id="r1" rows="3"></textarea>
+  </div>
+
+  <div class="section-footer">
+    <div class="validation-msg" id="validation-msg">આગળ વધતા પહેલાં બધા 6 પ્રસંગોમાં ઓછામાં ઓછો એક વિચાર પસંદ કરો.</div>
+    <button type="button" class="submit-btn next-section-btn" id="next-section-btn" disabled>વિભાગ 4 તરફ આગળ વધો</button>
+  </div>
+
+</div>
+
+<script>
+const SCENARIOS = [
+  {
+    id: "w1",
+    text: "રાત્રે મોડે સુધી કામ ચાલ્યું. ઊંઘ નથી આવતી. ફોન હાથમાં છે. ઘરમાં/રૂમમાં બીજું કોઈ નથી.",
+    options: [
+      "કોઈને ખબર તો નહીં જ પડે.",
+      "થોડી વાર જોઈ લઉં, કંઈ નહીં થાય.",
+      "આ તો મન કરે છે, હું ક્યાં કરું છું.",
+      "ફક્ત એક જ વાર છે, પછી નહીં કરું.",
+      "આમાંથી કોઈ વિચાર યાદ નથી."
+    ]
+  },
+  {
+    id: "w2",
+    text: "કોઈકે અપમાન કર્યું. એ જ સાંજે self negativity થાય છે, mood ખરાબ છે, કંઈક \"feel better\" કરવું છે.",
+    options: [
+      "આજે એટલો સ્ટ્રેસમાં/દુઃખી છું કે આ તો હકદાર છું.",
+      "આ સ્ટ્રેસ દૂર કરવાનો સૌથી સહેલો રસ્તો આ જ છે.",
+      "મારી કોઈ કિંમત નથી, તો આનાથી શું ફરક પડે છે.",
+      "પછી પ્રતિક્રમણ કરી લઈશ.",
+      "આમાંથી કોઈ વિચાર યાદ નથી."
+    ]
+  },
+  {
+    id: "w3",
+    text: "2 અઠવાડિયાથી સાફ ચાલતું હતું. આજે friend ના group chat માં કોઈએ suggestive reel/meme share કર્યું.",
+    options: [
+      "બીજા બધા પણ આવું જ કરે છે.",
+      "હું ગમે ત્યારે છોડી શકું છું, મારો કાબૂ છે.",
+      "આટલા દિવસ સાફ રહ્યો, હવે થોડું ચાલે.",
+      "ફક્ત એક જ વાર છે, પછી નહીં કરું.",
+      "આમાંથી કોઈ વિચાર યાદ નથી."
+    ]
+  },
+  {
+    id: "w4",
+    text: "Stress માંથી break લેવા ફોન ખોલ્યો. \"ફક્ત 5 મિનિટ જોઈ લઉં\" એમ વિચાર્યું.",
+    options: [
+      "આ તો મન કરે છે, હું ક્યાં કરું છું.",
+      "પછી પ્રતિક્રમણ કરી લઈશ.",
+      "થોડું જ છે, આનાથી કંઈ મોટું નુકસાન નહીં થાય.",
+      "કોઈને ખબર તો નહીં જ પડે.",
+      "આમાંથી કોઈ વિચાર યાદ નથી."
+    ]
+  },
+  {
+    id: "w5",
+    text: "સવારે ઊઠીને ખૂબ પસ્તાવો થયો. કોઈ નજીકનું પૂછે, \"કેમ ચાલે છે આજકાલ?\" — તમે શું કહેશો?",
+    prompt: "જવાબ આપતી વખતે (કે ટાળતી વખતે) મનમાં કયો વિચાર ચાલતો હતો?",
+    options: [
+      "સાચું કહીશ તો એ મારા વિશે શું વિચારશે?",
+      "આ કોઈના કામનું નથી.",
+      "આ એટલું મોટું નથી કે કહેવા જેવું હોય.",
+      "બીજા બધા પણ કંઈક ને કંઈક છુપાવે જ છે.",
+      "આમાંથી કોઈ વિચાર યાદ નથી."
+    ]
+  },
+  {
+    id: "w6",
+    text: "રાત્રે ઘરના, સાધક મિત્રો, roommate કે co-worker/co-સેવાર્થી સાથે ઝઘડો થયો. ગુસ્સો છે, કંઈક release જોઈએ છે.",
+    options: [
+      "આ સ્ટ્રેસ દૂર કરવાનો સૌથી સહેલો રસ્તો આ જ છે.",
+      "આ તો મન કરે છે, હું ક્યાં કરું છું.",
+      "આણે મને આટલું દુઃખ આપ્યું, તો મને પણ કંઈક જોઈએ.",
+      "પછી પ્રતિક્રમણ કરી લઈશ.",
+      "આમાંથી કોઈ વિચાર યાદ નથી."
+    ]
+  }
+];
+
+const DEFAULT_PROMPT = "આ ક્ષણે મનમાં કયો વિચાર ચાલતો હતો?";
+
+let PREV_ANSWERS = [];
+try {
+  PREV_ANSWERS = JSON.parse(sessionStorage.getItem("section2Answers")) || [];
+} catch (e) {
+  PREV_ANSWERS = [];
+}
+
+const container = document.getElementById("wb-container");
+const answered = new Set();
+
+function renderScenarios() {
+  SCENARIOS.forEach((s, idx) => {
+    const card = document.createElement("div");
+    card.className = "scn-card";
+    card.id = `card-${s.id}`;
+
+    const num = document.createElement("div");
+    num.className = "scn-num";
+    num.textContent = `પ્રસંગ ${idx + 1} / ${SCENARIOS.length}`;
+    card.appendChild(num);
+
+    const text = document.createElement("p");
+    text.className = "scn-text";
+    text.textContent = s.text;
+    card.appendChild(text);
+
+    const prevAnswer = PREV_ANSWERS[idx];
+    if (prevAnswer) {
+      const echo = document.createElement("div");
+      echo.className = "prev-answer";
+      echo.innerHTML = `<span class="prev-label">તમે પહેલાંના વિભાગમાં કહ્યું હતું:</span> "${prevAnswer}"`;
+      card.appendChild(echo);
+    }
+
+    const prompt = document.createElement("p");
+    prompt.className = "scn-prompt";
+    prompt.textContent = s.prompt || DEFAULT_PROMPT;
+    card.appendChild(prompt);
+
+    const opts = document.createElement("div");
+    opts.className = "options";
+    s.options.forEach((label, oi) => {
+      const optLabel = document.createElement("label");
+      optLabel.className = "option";
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.name = s.id;
+      input.value = oi + 1;
+      input.addEventListener("change", () => onToggle(s.id, optLabel, input));
+      optLabel.appendChild(input);
+      const span = document.createElement("span");
+      span.textContent = label;
+      optLabel.appendChild(span);
+      opts.appendChild(optLabel);
+    });
+    card.appendChild(opts);
+
+    container.appendChild(card);
+  });
+}
+
+function onToggle(id, optLabel, input) {
+  optLabel.classList.toggle("selected", input.checked);
+  const anyChecked = document.querySelectorAll(`input[name="${id}"]:checked`).length > 0;
+  if (anyChecked) {
+    answered.add(id);
+  } else {
+    answered.delete(id);
+  }
+  saveToSession();
+  updateProgress();
+}
+
+function saveToSession() {
+  const bySceneario = {};
+  SCENARIOS.forEach(s => {
+    const checked = [...document.querySelectorAll(`input[name="${s.id}"]:checked`)]
+      .map(el => s.options[el.value - 1])
+      .filter(text => text !== "આમાંથી કોઈ વિચાર યાદ નથી.");
+    bySceneario[s.id] = checked;
+  });
+  sessionStorage.setItem("section3Answers", JSON.stringify(bySceneario));
+}
+
+function saveReflection() {
+  sessionStorage.setItem("section3Reflection", document.getElementById("r1").value);
+}
+
+function updateProgress() {
+  const count = answered.size;
+  const total = SCENARIOS.length;
+  document.getElementById("progress-fill").style.width = `${(count / total) * 100}%`;
+  document.getElementById("progress-label").textContent = `${count} / ${total} પ્રસંગોમાં જવાબ આપ્યા`;
+  document.getElementById("next-section-btn").disabled = count < total;
+}
+
+document.getElementById("dev-fill-btn").addEventListener("click", () => {
+  SCENARIOS.forEach(s => {
+    const howMany = Math.floor(Math.random() * 2) + 1;
+    const indices = new Set();
+    while (indices.size < howMany) {
+      indices.add(Math.floor(Math.random() * s.options.length));
+    }
+    indices.forEach(i => {
+      const input = document.querySelector(`input[name="${s.id}"][value="${i + 1}"]`);
+      input.checked = true;
+      input.dispatchEvent(new Event("change"));
+    });
+  });
+});
+
+document.getElementById("r1").addEventListener("input", saveReflection);
+
+document.getElementById("next-section-btn").addEventListener("click", () => {
+  if (answered.size < SCENARIOS.length) {
+    document.getElementById("validation-msg").style.display = "block";
+    return;
+  }
+  saveToSession();
+  saveReflection();
+  window.location.href = "section4.html";
+});
+
+renderScenarios();
+</script>
+</body>
+</html>
