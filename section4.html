@@ -101,6 +101,22 @@
   .clear-btn:hover { color: var(--accent); border-color: var(--accent); }
   .assigned-quote { font-size: 0.84rem; line-height: 1.55; }
   .assigned-cite { font-size: 0.7rem; color: var(--muted); margin-top: 5px; }
+  .assigned-item {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px dashed var(--border);
+  }
+  .assigned-item:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  .assigned-more-hint {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-style: italic;
+    margin-top: 4px;
+  }
 
   .tech-pool {
     position: sticky;
@@ -395,54 +411,87 @@ function onCardClick(ti) {
   }
 }
 
+const MAX_PER_BELIEF = 3;
+
 function onSlotClick(bi) {
   if (armedIndex === null) return;
-  assignments[bi] = armedIndex;
+  const arr = assignments[bi] || [];
+  if (arr.includes(armedIndex)) {
+    flashBanner("આ કાર્ડ અહીં પહેલેથી જ ગોઠવેલું છે.");
+    return;
+  }
+  if (arr.length >= MAX_PER_BELIEF) {
+    flashBanner(`વધુમાં વધુ ${MAX_PER_BELIEF} કાર્ડ એક માન્યતા સામે ગોઠવી શકાય. પહેલાં એક હટાવો.`);
+    return;
+  }
+  arr.push(armedIndex);
+  assignments[bi] = arr;
   renderAssignment(bi);
   armedIndex = null;
   [...poolContainer.children].forEach(el => el.classList.remove("armed"));
   armedBanner.classList.remove("show");
 }
 
+function flashBanner(msg) {
+  armedBanner.textContent = msg;
+  armedBanner.classList.add("show");
+}
+
 function renderAssignment(bi) {
   const area = document.getElementById(`area-${bi}`);
-  const ti = assignments[bi];
-  if (ti === undefined) {
+  const arr = assignments[bi] || [];
+  if (arr.length === 0) {
     area.className = "assigned-area";
     area.textContent = "(હજુ કોઈ ટેકનીક ગોઠવી નથી — જમણેથી એક કાર્ડ પસંદ કરીને અહીં ક્લિક કરો)";
     return;
   }
-  const t = TECHNIQUES[ti];
   area.className = "assigned-area filled";
   area.innerHTML = "";
-  const titleRow = document.createElement("div");
-  titleRow.className = "assigned-title";
-  const titleSpan = document.createElement("span");
-  titleSpan.textContent = t.title;
-  const clearBtn = document.createElement("button");
-  clearBtn.className = "clear-btn";
-  clearBtn.textContent = "× remove";
-  clearBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    delete assignments[bi];
-    renderAssignment(bi);
+  arr.forEach((ti, pos) => {
+    const t = TECHNIQUES[ti];
+    const item = document.createElement("div");
+    item.className = "assigned-item";
+    const titleRow = document.createElement("div");
+    titleRow.className = "assigned-title";
+    const titleSpan = document.createElement("span");
+    titleSpan.textContent = t.title;
+    const clearBtn = document.createElement("button");
+    clearBtn.className = "clear-btn";
+    clearBtn.textContent = "× remove";
+    clearBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      assignments[bi] = (assignments[bi] || []).filter(x => x !== ti);
+      renderAssignment(bi);
+    });
+    titleRow.appendChild(titleSpan);
+    titleRow.appendChild(clearBtn);
+    item.appendChild(titleRow);
+    const quoteP = document.createElement("div");
+    quoteP.className = "assigned-quote";
+    quoteP.textContent = t.quote;
+    item.appendChild(quoteP);
+    const citeP = document.createElement("div");
+    citeP.className = "assigned-cite";
+    citeP.textContent = `Dadavani · ${t.cite}`;
+    item.appendChild(citeP);
+    area.appendChild(item);
   });
-  titleRow.appendChild(titleSpan);
-  titleRow.appendChild(clearBtn);
-  area.appendChild(titleRow);
-  const quoteP = document.createElement("div");
-  quoteP.className = "assigned-quote";
-  quoteP.textContent = t.quote;
-  area.appendChild(quoteP);
-  const citeP = document.createElement("div");
-  citeP.className = "assigned-cite";
-  citeP.textContent = `Dadavani · ${t.cite}`;
-  area.appendChild(citeP);
+  if (arr.length < MAX_PER_BELIEF) {
+    const hint = document.createElement("div");
+    hint.className = "assigned-more-hint";
+    hint.textContent = `(વધુ ${MAX_PER_BELIEF - arr.length} કાર્ડ ઉમેરી શકાય)`;
+    area.appendChild(hint);
+  }
 }
 
 document.getElementById("dev-fill-btn").addEventListener("click", () => {
   BELIEFS.forEach((b, bi) => {
-    assignments[bi] = Math.floor(Math.random() * TECHNIQUES.length);
+    const howMany = Math.floor(Math.random() * MAX_PER_BELIEF) + 1;
+    const picks = new Set();
+    while (picks.size < howMany) {
+      picks.add(Math.floor(Math.random() * TECHNIQUES.length));
+    }
+    assignments[bi] = [...picks];
     renderAssignment(bi);
   });
 });
