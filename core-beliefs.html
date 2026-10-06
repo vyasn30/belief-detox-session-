@@ -270,7 +270,17 @@ function onAnswer(belief, card, opts, value) {
   [...opts.children].forEach(o => o.classList.remove("selected"));
   opts.children[value - 1].classList.add("selected");
   document.getElementById(`ref-${belief.id}`).classList.add("show");
+  saveToSession();
   updateProgress();
+}
+
+function saveToSession() {
+  const data = BELIEFS.map(b => {
+    const value = answers[b.id];
+    if (!value) return null;
+    return { statement: b.statement, ratingIdx: value, ratingLabel: OPTIONS[value - 1] };
+  });
+  sessionStorage.setItem("section1Answers", JSON.stringify(data));
 }
 
 function updateProgress() {

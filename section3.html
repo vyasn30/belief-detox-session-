@@ -153,6 +153,23 @@
     opacity: 0.45;
     cursor: not-allowed;
   }
+  .report-card-row {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+    text-align: center;
+  }
+  .report-card-btn {
+    background: none;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 10px 22px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+  .report-card-btn:hover { background: var(--accent-soft); }
 </style>
 </head>
 <body>
@@ -255,7 +272,25 @@ try {
   PREV_ANSWERS = [];
 }
 
-const responses = SCENARIOS.map(s => ({ id: s.id, belief: "", statusIdx: null, duration: "", submitted: false }));
+let CUSTOM_PRASANGS = [];
+try {
+  CUSTOM_PRASANGS = JSON.parse(sessionStorage.getItem("section2CustomPrasangs")) || [];
+} catch (e) {
+  CUSTOM_PRASANGS = [];
+}
+
+const ALL_SCENARIOS = [
+  ...SCENARIOS.map((s, i) => ({ ...s, prevAnswer: PREV_ANSWERS[i] || null, custom: false })),
+  ...CUSTOM_PRASANGS.map((p, i) => ({
+    id: `custom-${i}`,
+    text: p.text,
+    prevAnswer: p.answer,
+    hints: [],
+    custom: true
+  }))
+];
+
+const responses = ALL_SCENARIOS.map(s => ({ id: s.id, scenarioText: s.text, belief: "", statusIdx: null, duration: "", submitted: false }));
 let currentIndex = 0;
 
 const pager = document.getElementById("scenario-pager");
@@ -265,7 +300,7 @@ function isComplete(r) {
 }
 
 function renderScenario() {
-  const s = SCENARIOS[currentIndex];
+  const s = ALL_SCENARIOS[currentIndex];
   const r = responses[currentIndex];
   pager.innerHTML = "";
 
@@ -274,7 +309,7 @@ function renderScenario() {
 
   const num = document.createElement("div");
   num.className = "scn-num";
-  num.textContent = `પ્રસંગ ${currentIndex + 1} / ${SCENARIOS.length}`;
+  num.textContent = `પ્રસંગ ${currentIndex + 1} / ${ALL_SCENARIOS.length}` + (s.custom ? " (તમારો પોતાનો પ્રસંગ)" : "");
   card.appendChild(num);
 
   const text = document.createElement("p");
@@ -282,7 +317,7 @@ function renderScenario() {
   text.textContent = s.text;
   card.appendChild(text);
 
-  const prevAnswer = PREV_ANSWERS[currentIndex];
+  const prevAnswer = s.prevAnswer;
   if (prevAnswer) {
     const echo = document.createElement("div");
     echo.className = "prev-answer";
@@ -327,29 +362,31 @@ function renderScenario() {
   });
   card.appendChild(submitBtn);
 
-  const hintRow = document.createElement("div");
-  hintRow.className = "hint-row";
-  const hintBtn = document.createElement("button");
-  hintBtn.type = "button";
-  hintBtn.className = "hint-btn";
-  hintBtn.textContent = "Hint જોઈએ છે?";
-  const hintBox = document.createElement("div");
-  hintBox.className = "hint-box";
-  const hintTitle = document.createElement("div");
-  hintTitle.className = "hint-title";
-  hintTitle.textContent = "દા.ત.";
-  hintBox.appendChild(hintTitle);
-  const hintList = document.createElement("ul");
-  s.hints.forEach(h => {
-    const li = document.createElement("li");
-    li.textContent = h;
-    hintList.appendChild(li);
-  });
-  hintBox.appendChild(hintList);
-  hintBtn.addEventListener("click", () => hintBox.classList.toggle("show"));
-  hintRow.appendChild(hintBtn);
-  hintRow.appendChild(hintBox);
-  card.appendChild(hintRow);
+  if (s.hints && s.hints.length > 0) {
+    const hintRow = document.createElement("div");
+    hintRow.className = "hint-row";
+    const hintBtn = document.createElement("button");
+    hintBtn.type = "button";
+    hintBtn.className = "hint-btn";
+    hintBtn.textContent = "Hint જોઈએ છે?";
+    const hintBox = document.createElement("div");
+    hintBox.className = "hint-box";
+    const hintTitle = document.createElement("div");
+    hintTitle.className = "hint-title";
+    hintTitle.textContent = "દા.ત.";
+    hintBox.appendChild(hintTitle);
+    const hintList = document.createElement("ul");
+    s.hints.forEach(h => {
+      const li = document.createElement("li");
+      li.textContent = h;
+      hintList.appendChild(li);
+    });
+    hintBox.appendChild(hintList);
+    hintBtn.addEventListener("click", () => hintBox.classList.toggle("show"));
+    hintRow.appendChild(hintBtn);
+    hintRow.appendChild(hintBox);
+    card.appendChild(hintRow);
+  }
 
   const statusBlock = document.createElement("div");
   statusBlock.className = "status-block" + (r.submitted ? " show" : "");
@@ -415,11 +452,11 @@ function renderScenario() {
   nextBtn.type = "button";
   nextBtn.id = "next-btn";
   nextBtn.className = "submit-btn next-section-btn";
-  nextBtn.textContent = currentIndex === SCENARIOS.length - 1 ? "વિભાગ 4 તરફ આગળ વધો" : "આગળ →";
+  nextBtn.textContent = currentIndex === ALL_SCENARIOS.length - 1 ? "વિભાગ 4 તરફ આગળ વધો" : "આગળ →";
   nextBtn.disabled = !isComplete(r);
   nextBtn.addEventListener("click", () => {
     if (!isComplete(r)) return;
-    if (currentIndex < SCENARIOS.length - 1) {
+    if (currentIndex < ALL_SCENARIOS.length - 1) {
       currentIndex++;
       renderScenario();
     } else {
@@ -430,6 +467,21 @@ function renderScenario() {
   nav.appendChild(backBtn);
   nav.appendChild(nextBtn);
   card.appendChild(nav);
+
+  if (currentIndex === ALL_SCENARIOS.length - 1) {
+    const reportRow = document.createElement("div");
+    reportRow.className = "report-card-row";
+    const reportBtn = document.createElement("button");
+    reportBtn.type = "button";
+    reportBtn.className = "report-card-btn";
+    reportBtn.textContent = "રિપોર્ટ કાર્ડ મેળવો (PDF)";
+    reportBtn.addEventListener("click", () => {
+      saveToSession();
+      window.location.href = "report-card.html?print=1";
+    });
+    reportRow.appendChild(reportBtn);
+    card.appendChild(reportRow);
+  }
 
   pager.appendChild(card);
   updateProgress();
@@ -443,7 +495,7 @@ function updateNav() {
 
 function updateProgress() {
   const count = responses.filter(isComplete).length;
-  const total = SCENARIOS.length;
+  const total = ALL_SCENARIOS.length;
   document.getElementById("progress-fill").style.width = `${(count / total) * 100}%`;
   document.getElementById("progress-label").textContent = `${count} / ${total} પ્રસંગ પૂરા`;
 }

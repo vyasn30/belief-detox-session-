@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="gu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>રિપોર્ટ કાર્ડ – Belief Detox Session</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .rc-actions {
+    max-width: 760px;
+    margin: 16px auto 0;
+    padding: 0 16px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .rc-back-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 9px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 0.88rem;
+  }
+  .rc-pdf-btn {
+    padding: 9px 20px;
+    font-size: 0.88rem;
+  }
+
+  .page {
+    max-width: 760px;
+    margin: 20px auto 60px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 40px 44px;
+    box-shadow: 0 1px 2px rgba(43,35,24,0.05), 0 10px 30px rgba(43,35,24,0.06);
+  }
+
+  header.rc-top {
+    text-align: center;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 26px;
+  }
+  .rc-eyebrow {
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--accent); font-weight: 700; margin-bottom: 8px;
+  }
+  .rc-h1 {
+    font-weight: 600;
+    font-size: 1.7rem; margin: 0 0 8px;
+  }
+  .rc-sub { color: var(--muted); font-size: 0.9rem; max-width: 46ch; margin: 0 auto; }
+  .rc-date { color: var(--muted); font-size: 0.78rem; margin-top: 10px; }
+
+  .rc-section { margin-bottom: 30px; }
+  .rc-section-title {
+    font-weight: 700;
+    font-size: 1.15rem; margin: 0 0 4px;
+    display: flex; align-items: baseline; gap: 8px;
+  }
+  .rc-section-num {
+    font-size: 0.72rem; color: var(--accent); font-weight: 700;
+    border: 1px solid var(--accent-soft); border-radius: 999px; padding: 1px 9px;
+  }
+  .rc-section-sub { color: var(--muted); font-size: 0.82rem; margin: 0 0 16px; }
+  .rc-empty { color: var(--muted); font-size: 0.88rem; font-style: italic; }
+
+  .belief-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 14px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .belief-row:last-child { border-bottom: none; }
+  .belief-row-text { font-size: 0.9rem; line-height: 1.5; }
+  .rating-pill {
+    font-size: 0.74rem; font-weight: 700; white-space: nowrap;
+    padding: 3px 11px; border-radius: 999px; color: #fff;
+  }
+
+  .scn-row {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .scn-row:last-child { border-bottom: none; }
+  .scn-row-label {
+    font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--accent); font-weight: 700; margin-bottom: 3px;
+  }
+  .scn-row-text { font-size: 0.9rem; line-height: 1.5; }
+
+  .wb-card {
+    background: var(--accent-soft);
+    border-left: 4px solid var(--accent);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+  .wb-card:last-of-type { margin-bottom: 0; }
+  .wb-card-custom {
+    border: 2px solid var(--accent);
+    border-left-width: 6px;
+    box-shadow: 0 2px 14px rgba(181,67,42,0.18);
+    position: relative;
+  }
+  .wb-scenario-tag {
+    font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--accent); font-weight: 700; margin-bottom: 8px;
+  }
+  .wb-scenario-tag-custom {
+    display: inline-block;
+    color: #fff;
+    background: var(--accent);
+    border-radius: 999px;
+    padding: 3px 12px;
+    margin-bottom: 10px;
+  }
+  .wb-belief {
+    font-family: Georgia, "Noto Sans Gujarati", serif;
+    font-weight: 500; font-style: italic;
+    font-size: 1.15rem; line-height: 1.55;
+    color: var(--text);
+    margin: 0 0 10px;
+  }
+  .wb-card-custom .wb-belief {
+    font-size: 1.28rem;
+  }
+  .wb-status-row {
+    display: flex; align-items: baseline; gap: 6px;
+    font-size: 0.82rem;
+  }
+  .wb-status-label {
+    color: var(--muted); font-weight: 700; white-space: nowrap;
+  }
+  .wb-status { color: var(--text); }
+
+  .scn-row-custom {
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+  .scn-row-custom .scn-row-label {
+    display: inline-block;
+    color: #fff;
+    background: var(--accent);
+    border-radius: 999px;
+    padding: 2px 11px;
+    margin-bottom: 8px;
+  }
+
+  .chart-wrap { margin-top: 18px; }
+  .chart-title {
+    font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--muted); font-weight: 700; margin-bottom: 12px;
+  }
+  .bar-row {
+    display: grid;
+    grid-template-columns: 38% 1fr 22px;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .bar-label { font-size: 0.78rem; color: var(--text); line-height: 1.35; }
+  .bar-track {
+    background: var(--accent-soft);
+    border-radius: 999px;
+    height: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .bar-fill {
+    background: var(--accent);
+    height: 100%;
+    border-radius: 999px;
+  }
+  .bar-count {
+    font-size: 0.8rem; font-weight: 700; color: var(--text);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rc-note {
+    margin-top: 10px; padding: 12px 16px; background: var(--accent-soft);
+    border-radius: 10px; font-size: 0.82rem; color: var(--text); line-height: 1.6;
+  }
+
+  footer.rc-end {
+    text-align: center; color: var(--muted); font-size: 0.78rem;
+    margin-top: 10px; padding-top: 20px; border-top: 1px solid var(--border);
+  }
+
+  @media print {
+    body { background: #fff; }
+    .rc-actions, .dev-fill-btn { display: none !important; }
+    .page {
+      box-shadow: none;
+      border: none;
+      margin: 0 auto;
+      max-width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="rc-actions">
+  <button type="button" class="rc-back-btn" id="back-btn">← સર્વે પર પાછા</button>
+  <button type="button" class="submit-btn rc-pdf-btn" id="pdf-btn">PDF તરીકે ડાઉનલોડ કરો</button>
+</div>
+
+<div class="page" id="report-page">
+  <header class="rc-top">
+    <div class="rc-eyebrow">Report Card</div>
+    <h1 class="rc-h1">તમારો રિપોર્ટ કાર્ડ</h1>
+    <p class="rc-sub">આ કોઈ ગ્રેડ નથી — ફક્ત તમે આજે જે લખ્યું અને પસંદ કર્યું, એનો એક-પાનાનો સારાંશ છે.</p>
+    <div class="rc-date" id="rc-date"></div>
+  </header>
+
+  <section class="rc-section" id="section1-recap">
+    <div class="rc-section-title">
+      <span class="rc-section-num">1</span>
+      <span>મૂળભૂત માન્યતાઓ</span>
+    </div>
+    <p class="rc-section-sub">6 વાક્યો, તમે કેટલા સંમત હતા</p>
+    <div id="section1-list"></div>
+  </section>
+
+  <section class="rc-section" id="section2-recap">
+    <div class="rc-section-title">
+      <span class="rc-section-num">2</span>
+      <span>પ્રસંગોમાં પસંદગી</span>
+    </div>
+    <p class="rc-section-sub">નબળા દિવસના પ્રસંગોમાં, તમે ખરેખર શું કરશો એમ કહ્યું</p>
+    <div id="section2-list"></div>
+  </section>
+
+  <section class="rc-section" id="section3-recap">
+    <div class="rc-section-title">
+      <span class="rc-section-num">3</span>
+      <span>ખોટી માન્યતાઓ</span>
+    </div>
+    <p class="rc-section-sub">તમે પોતે લખેલી માન્યતાઓ, અને દરેક સાથે તમે અત્યારે ક્યાં છો</p>
+    <div id="section3-list"></div>
+    <div class="chart-wrap" id="section3-chart"></div>
+    <div class="rc-note">આ બધી માન્યતાઓ સારી કે ખરાબ નથી — ફક્ત આજે તમે ક્યાં ઊભા છો એનું ચિત્ર છે.</div>
+  </section>
+
+  <footer class="rc-end">
+    Belief Detox Session — વિભાગ 1-3 નો સારાંશ. વિભાગ 4 (ટેકનીક મેચિંગ) આમાં સામેલ નથી.
+  </footer>
+</div>
+
+<script>
+const STATUS_OPTIONS = [
+  "આ માન્યતા સામે મેં હજુ કંઈ કામ કર્યું નથી.",
+  "આ માન્યતાને તોડવાની ચાવી હજુ મળી નથી.",
+  "સત્સંગ/વાંચનથી ચાવી મળી છે, પણ એના પર એટલું કામ કરી શક્યો નથી.",
+  "ચાવી મળી છે અને કામ કરું છું, પણ માન્યતા તૂટતી નથી.",
+  "કામ કરું છું અને તૂટે છે પણ — અમુક સમય સારું જાય છે, પછી પાછી એ જ તકલીફ આવે છે.",
+  "આ માન્યતા મને એટલી હેરાન કરતી નથી."
+];
+
+function readJSON(key, fallback) {
+  try {
+    const v = JSON.parse(sessionStorage.getItem(key));
+    return v === null || v === undefined ? fallback : v;
+  } catch (e) {
+    return fallback;
+  }
+}
+
+document.getElementById("rc-date").textContent = new Date().toLocaleDateString("gu-IN", { year: "numeric", month: "long", day: "numeric" });
+
+// Section 1
+const section1Answers = readJSON("section1Answers", []).filter(Boolean);
+const s1List = document.getElementById("section1-list");
+if (section1Answers.length === 0) {
+  s1List.innerHTML = '<div class="rc-empty">વિભાગ 1 હજુ પૂરું કર્યું નથી.</div>';
+} else {
+  section1Answers.forEach(a => {
+    const row = document.createElement("div");
+    row.className = "belief-row";
+    const tIdx = Math.min(5, Math.max(1, 6 - a.ratingIdx));
+    row.innerHTML = `
+      <div class="belief-row-text">${a.statement}</div>
+      <div class="rating-pill" style="background:var(--t${tIdx})">${a.ratingLabel}</div>
+    `;
+    s1List.appendChild(row);
+  });
+}
+
+// Section 2
+const section2Answers = readJSON("section2Answers", []);
+const section2Custom = readJSON("section2CustomPrasangs", []);
+const s2List = document.getElementById("section2-list");
+const s2Filled = section2Answers.filter(Boolean);
+if (s2Filled.length === 0 && section2Custom.length === 0) {
+  s2List.innerHTML = '<div class="rc-empty">વિભાગ 2 હજુ પૂરું કર્યું નથી.</div>';
+} else {
+  section2Answers.forEach((ans, i) => {
+    if (!ans) return;
+    const row = document.createElement("div");
+    row.className = "scn-row";
+    row.innerHTML = `
+      <div class="scn-row-label">પ્રસંગ ${i + 1}</div>
+      <div class="scn-row-text">${ans}</div>
+    `;
+    s2List.appendChild(row);
+  });
+  section2Custom.forEach((p, i) => {
+    const row = document.createElement("div");
+    row.className = "scn-row scn-row-custom";
+    row.innerHTML = `
+      <div class="scn-row-label">⭐ તમારો પ્રસંગ ${i + 1}</div>
+      <div class="scn-row-text">${p.text}</div>
+      <div class="scn-row-text" style="margin-top:4px; color:var(--muted);">${p.answer}</div>
+    `;
+    s2List.appendChild(row);
+  });
+}
+
+// Section 3
+const section3Beliefs = readJSON("section3Beliefs", []);
+const s3List = document.getElementById("section3-list");
+const s3Chart = document.getElementById("section3-chart");
+const completed = section3Beliefs.filter(r => r && r.belief && r.belief.trim().length > 0 && r.statusIdx !== null && r.statusIdx !== undefined);
+
+if (completed.length === 0) {
+  s3List.innerHTML = '<div class="rc-empty">વિભાગ 3 હજુ પૂરું કર્યું નથી.</div>';
+} else {
+  let builtInCount = 0;
+  let customCount = 0;
+  completed.forEach(r => {
+    const isCustom = String(r.id).startsWith("custom-");
+    let statusText = STATUS_OPTIONS[r.statusIdx] || "";
+    if (r.duration) statusText += ` (${r.duration})`;
+    const card = document.createElement("div");
+    card.className = "wb-card" + (isCustom ? " wb-card-custom" : "");
+    const tagHtml = isCustom
+      ? `<div class="wb-scenario-tag wb-scenario-tag-custom">⭐ તમારો પ્રસંગ ${++customCount}</div>`
+      : `<div class="wb-scenario-tag">પ્રસંગ ${++builtInCount}</div>`;
+    card.innerHTML = `
+      ${tagHtml}
+      <p class="wb-belief">"${r.belief}"</p>
+      <div class="wb-status-row">
+        <span class="wb-status-label">સ્થિતિ:</span>
+        <span class="wb-status">${statusText}</span>
+      </div>
+    `;
+    s3List.appendChild(card);
+  });
+
+  const counts = STATUS_OPTIONS.map((_, idx) => completed.filter(r => r.statusIdx === idx).length);
+  const total = completed.length;
+  let chartHtml = `<div class="chart-title">તમારી ${total} માન્યતાઓ, સ્થિતિ પ્રમાણે</div>`;
+  STATUS_OPTIONS.forEach((label, idx) => {
+    const count = counts[idx];
+    const pct = total > 0 ? (count / total) * 100 : 0;
+    chartHtml += `
+      <div class="bar-row">
+        <div class="bar-label">${label}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+        <div class="bar-count">${count}</div>
+      </div>
+    `;
+  });
+  s3Chart.innerHTML = chartHtml;
+}
+
+document.getElementById("back-btn").addEventListener("click", () => {
+  window.location.href = "section3.html";
+});
+document.getElementById("pdf-btn").addEventListener("click", () => {
+  window.print();
+});
+
+const params = new URLSearchParams(window.location.search);
+if (params.get("print") === "1") {
+  setTimeout(() => window.print(), 400);
+}
+</script>
+</body>
+</html>

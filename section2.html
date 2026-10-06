@@ -39,6 +39,87 @@
     margin: -2px 0 10px;
     font-style: italic;
   }
+
+  .custom-prasang-card {
+    background: var(--card);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 14px;
+  }
+  .custom-prasang-intro {
+    font-size: 0.88rem;
+    color: var(--muted);
+    margin: 0 0 14px;
+    line-height: 1.6;
+  }
+  .custom-prasang-card label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.92rem;
+    margin: 0 0 6px;
+  }
+  .custom-prasang-card textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    resize: vertical;
+    margin-bottom: 14px;
+  }
+  .custom-prasang-msg {
+    display: none;
+    color: var(--accent);
+    font-size: 0.84rem;
+    margin: -6px 0 12px;
+  }
+  .custom-prasang-msg.show { display: block; }
+  .custom-add-btn {
+    padding: 10px 24px;
+    font-size: 0.92rem;
+  }
+
+  .custom-prasang-item {
+    background: var(--accent-soft);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .custom-prasang-item-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .custom-prasang-item-text {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    line-height: 1.6;
+  }
+  .custom-prasang-item-answer {
+    font-size: 0.9rem;
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .custom-prasang-remove {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 0.72rem;
+    cursor: pointer;
+  }
+  .custom-prasang-remove:hover { color: var(--accent); border-color: var(--accent); }
   .section-divider {
     margin: 32px 0 18px;
     display: flex;
@@ -87,6 +168,23 @@
   <form id="scenarios-form">
     <div id="scenarios-container"></div>
   </form>
+
+  <div class="section-divider"><span>તમારો પોતાનો પ્રસંગ</span></div>
+
+  <div class="custom-prasang-card">
+    <p class="custom-prasang-intro">ઉપરના 6 પ્રસંગો સિવાય, તમારા પોતાના જીવનમાંથી કોઈ એવો પ્રસંગ યાદ આવે છે જ્યાં નબળી ક્ષણ આવી હોય? તમે જેટલા પ્રસંગ ઉમેરવા હોય એટલા ઉમેરી શકો છો.</p>
+
+    <label for="custom-text">પ્રસંગ શું હતો?</label>
+    <textarea id="custom-text" rows="2" placeholder="શું થયું હતું, ક્યાં હતા, શું feel થતું હતું..."></textarea>
+
+    <label for="custom-answer">તમે ત્યાં ખરેખર શું કર્યું (કે કરશો)?</label>
+    <textarea id="custom-answer" rows="2" placeholder="તમારા પોતાના શબ્દોમાં લખો..."></textarea>
+
+    <div class="custom-prasang-msg" id="custom-prasang-msg">બંને જગ્યાએ લખો, પછી ઉમેરો.</div>
+    <button type="button" class="submit-btn custom-add-btn" id="add-prasang-btn">+ પ્રસંગ ઉમેરો</button>
+  </div>
+
+  <div id="custom-prasangs-list"></div>
 
   <div class="section-divider"><span>Reflection — text, not scored</span></div>
 
@@ -263,7 +361,74 @@ document.getElementById("next-section-btn").addEventListener("click", () => {
   window.location.href = "section3.html";
 });
 
+let customPrasangs = [];
+try {
+  customPrasangs = JSON.parse(sessionStorage.getItem("section2CustomPrasangs")) || [];
+} catch (e) {
+  customPrasangs = [];
+}
+
+function saveCustomPrasangs() {
+  sessionStorage.setItem("section2CustomPrasangs", JSON.stringify(customPrasangs));
+}
+
+function renderCustomPrasangs() {
+  const list = document.getElementById("custom-prasangs-list");
+  list.innerHTML = "";
+  customPrasangs.forEach((p, i) => {
+    const item = document.createElement("div");
+    item.className = "custom-prasang-item";
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "custom-prasang-remove";
+    removeBtn.textContent = "× remove";
+    removeBtn.addEventListener("click", () => {
+      customPrasangs.splice(i, 1);
+      saveCustomPrasangs();
+      renderCustomPrasangs();
+    });
+    item.appendChild(removeBtn);
+
+    const label = document.createElement("div");
+    label.className = "custom-prasang-item-label";
+    label.textContent = `તમારો પ્રસંગ ${i + 1}`;
+    item.appendChild(label);
+
+    const text = document.createElement("div");
+    text.className = "custom-prasang-item-text";
+    text.textContent = p.text;
+    item.appendChild(text);
+
+    const answer = document.createElement("div");
+    answer.className = "custom-prasang-item-answer";
+    answer.textContent = p.answer;
+    item.appendChild(answer);
+
+    list.appendChild(item);
+  });
+}
+
+document.getElementById("add-prasang-btn").addEventListener("click", () => {
+  const textEl = document.getElementById("custom-text");
+  const answerEl = document.getElementById("custom-answer");
+  const text = textEl.value.trim();
+  const answer = answerEl.value.trim();
+  const msg = document.getElementById("custom-prasang-msg");
+  if (!text || !answer) {
+    msg.classList.add("show");
+    return;
+  }
+  msg.classList.remove("show");
+  customPrasangs.push({ text, answer });
+  saveCustomPrasangs();
+  textEl.value = "";
+  answerEl.value = "";
+  renderCustomPrasangs();
+});
+
 renderScenarios();
+renderCustomPrasangs();
 </script>
 </body>
 </html>
