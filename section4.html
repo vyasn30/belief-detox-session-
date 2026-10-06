@@ -64,6 +64,14 @@
     line-height: 1.6;
     margin: 0 0 10px;
   }
+  .belief-status-line {
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-style: italic;
+    margin: -4px 0 12px;
+    padding-left: 10px;
+    border-left: 2px solid var(--border);
+  }
   .assigned-area {
     min-height: 38px;
     border: 1px dashed var(--border);
@@ -309,22 +317,25 @@ const TECHNIQUES = [
   }
 ];
 
+const STATUS_OPTIONS = [
+  "આ માન્યતા સામે મેં હજુ કંઈ કામ કર્યું નથી.",
+  "આ માન્યતાને તોડવાની ચાવી હજુ મળી નથી.",
+  "સત્સંગ/વાંચનથી ચાવી મળી છે, પણ એના પર એટલું કામ કરી શક્યો નથી.",
+  "ચાવી મળી છે અને કામ કરું છું, પણ માન્યતા તૂટતી નથી.",
+  "કામ કરું છું અને તૂટે છે પણ — અમુક સમય સારું જાય છે, પછી પાછી એ જ તકલીફ આવે છે.",
+  "આ માન્યતા મને એટલી હેરાન કરતી નથી."
+];
+
 let BELIEFS = [];
 try {
-  const s3 = JSON.parse(sessionStorage.getItem("section3Answers")) || {};
-  const seen = new Set();
-  Object.values(s3).forEach(arr => {
-    (arr || []).forEach(text => {
-      if (text && !seen.has(text)) {
-        seen.add(text);
-        BELIEFS.push({ text, custom: false });
-      }
-    });
+  const s3 = JSON.parse(sessionStorage.getItem("section3Beliefs")) || [];
+  s3.forEach(r => {
+    const text = (r.belief || "").trim();
+    if (!text) return;
+    let status = r.statusIdx !== null && r.statusIdx !== undefined ? STATUS_OPTIONS[r.statusIdx] : null;
+    if (status && r.duration) status += ` (${r.duration})`;
+    BELIEFS.push({ text, custom: true, status });
   });
-  const reflection = (sessionStorage.getItem("section3Reflection") || "").trim();
-  if (reflection) {
-    BELIEFS.push({ text: reflection, custom: true });
-  }
 } catch (e) {
   BELIEFS = [];
 }
@@ -352,13 +363,20 @@ function renderBeliefs() {
 
     const qlabel = document.createElement("div");
     qlabel.className = "belief-q-label";
-    qlabel.textContent = b.custom ? "તમે લખેલું" : "ખોટી માન્યતા";
+    qlabel.textContent = "તમે લખેલી માન્યતા";
     slot.appendChild(qlabel);
 
     const stmt = document.createElement("p");
     stmt.className = "belief-statement";
     stmt.textContent = b.text;
     slot.appendChild(stmt);
+
+    if (b.status) {
+      const statusLine = document.createElement("div");
+      statusLine.className = "belief-status-line";
+      statusLine.textContent = b.status;
+      slot.appendChild(statusLine);
+    }
 
     const area = document.createElement("div");
     area.className = "assigned-area";
