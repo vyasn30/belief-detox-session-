@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>રિપોર્ટ કાર્ડ – Belief Detox Session</title>
 <link rel="stylesheet" href="styles.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
   .rc-actions {
     max-width: 760px;
@@ -376,13 +377,31 @@ if (completed.length === 0) {
 document.getElementById("back-btn").addEventListener("click", () => {
   window.location.href = "section3.html";
 });
-document.getElementById("pdf-btn").addEventListener("click", () => {
-  window.print();
-});
+function downloadReportPdf() {
+  const btn = document.getElementById("pdf-btn");
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "PDF બની રહ્યું છે…";
+  html2pdf()
+    .set({
+      filename: "report-card.pdf",
+      margin: 10,
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+    })
+    .from(document.getElementById("report-page"))
+    .save()
+    .then(() => {
+      btn.disabled = false;
+      btn.textContent = originalLabel;
+    });
+}
+
+document.getElementById("pdf-btn").addEventListener("click", downloadReportPdf);
 
 const params = new URLSearchParams(window.location.search);
 if (params.get("print") === "1") {
-  setTimeout(() => window.print(), 400);
+  setTimeout(downloadReportPdf, 400);
 }
 </script>
 </body>
