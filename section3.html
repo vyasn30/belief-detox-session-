@@ -448,24 +448,21 @@ function renderScenario() {
       renderScenario();
     }
   });
-  const nextBtn = document.createElement("button");
-  nextBtn.type = "button";
-  nextBtn.id = "next-btn";
-  nextBtn.className = "submit-btn next-section-btn";
-  nextBtn.textContent = currentIndex === ALL_SCENARIOS.length - 1 ? "વિભાગ 4 તરફ આગળ વધો" : "આગળ →";
-  nextBtn.disabled = !isComplete(r);
-  nextBtn.addEventListener("click", () => {
-    if (!isComplete(r)) return;
-    if (currentIndex < ALL_SCENARIOS.length - 1) {
+  nav.appendChild(backBtn);
+  if (currentIndex < ALL_SCENARIOS.length - 1) {
+    const nextBtn = document.createElement("button");
+    nextBtn.type = "button";
+    nextBtn.id = "next-btn";
+    nextBtn.className = "submit-btn next-section-btn";
+    nextBtn.textContent = "આગળ →";
+    nextBtn.disabled = !isComplete(r);
+    nextBtn.addEventListener("click", () => {
+      if (!isComplete(r)) return;
       currentIndex++;
       renderScenario();
-    } else {
-      saveToSession();
-      window.location.href = "section4.html";
-    }
-  });
-  nav.appendChild(backBtn);
-  nav.appendChild(nextBtn);
+    });
+    nav.appendChild(nextBtn);
+  }
   card.appendChild(nav);
 
   if (currentIndex === ALL_SCENARIOS.length - 1) {
