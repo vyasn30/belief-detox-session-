@@ -300,34 +300,6 @@ function init() {
     updateProgress();
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
-
-  const devFillBtn = document.getElementById("dev-fill-btn");
-  if (devFillBtn) {
-    devFillBtn.addEventListener("click", () => {
-      SECTIONS.forEach(section => {
-        section.questions.forEach(q => {
-          const questionOptions = q.options || section.options || OPTIONS;
-          const value = Math.floor(Math.random() * questionOptions.length) + 1;
-          const input = form.querySelector(`input[name="q${q.id}"][value="${value}"]`);
-          if (input) {
-            input.checked = true;
-            input.dispatchEvent(new Event("change", { bubbles: true }));
-          }
-          if (q.trigger_box) {
-            const ta = form.querySelector(`textarea[name="trigger${q.id}"]`);
-            if (ta) ta.value = `Test trigger ${Math.floor(Math.random() * 1000)}`;
-          }
-        });
-        if (section.reflection) {
-          section.reflection.forEach(r => {
-            const ta = form.querySelector(`textarea[name="${r.id}"]`);
-            if (ta) ta.value = `Test reflection ${Math.floor(Math.random() * 1000)}`;
-          });
-        }
-      });
-      updateProgress();
-    });
-  }
 }
 
 init();

@@ -148,7 +148,6 @@
 </style>
 </head>
 <body>
-<button type="button" id="dev-fill-btn" class="dev-fill-btn">🛠 Fill random (dev)</button>
 <div class="wrap">
 
   <header class="top">
@@ -343,15 +342,6 @@ function updateProgress() {
   document.getElementById("progress-label").textContent = `${count} / ${total} જવાબ આપ્યા`;
   document.getElementById("next-section-btn").disabled = count < total;
 }
-
-document.getElementById("dev-fill-btn").addEventListener("click", () => {
-  SCENARIOS.forEach(s => {
-    const value = Math.floor(Math.random() * s.options.length) + 1;
-    const input = document.querySelector(`input[name="${s.id}"][value="${value}"]`);
-    input.checked = true;
-    input.dispatchEvent(new Event("change"));
-  });
-});
 
 document.getElementById("next-section-btn").addEventListener("click", () => {
   if (Object.keys(answers).length < SCENARIOS.length) {
